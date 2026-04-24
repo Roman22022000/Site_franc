@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Карусель — анимация вправо</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(145deg, #eef2f7 0%, #d4dfe9 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* ---------------- FRAME ---------------- */
+.frame {
+    position: relative; /* FIX */
+    border-radius: 56px;
+    padding: 36px 32px 48px;
+    max-width: 1200px;
+    min-height: 800px;
+    width: 100%;
+    overflow: hidden; /* важно для обрезки фона */
+    box-shadow: 0 30px 48px rgba(0,0,0,0.18);
+}
+
+/* ФОН ВНУТРИ БЛОКА */
+.frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('fon_alif.png') center/cover no-repeat; /* вставь свой фон */
+    opacity: 0.95;
+    z-index: 0;
+}
+
+/* затемнение/белый слой */
+.frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.92);
+    z-index: 1;
+}
+
+/* контент поверх */
+.frame > * {
+    position: relative;
+    z-index: 2;
+}
+
+/* ---------------- CAROUSEL ---------------- */
+.carousel-container {
+    overflow-x: clip;
+    margin: 0 auto;
+    border-radius: 48px;
+    padding: 16px 0 32px 0;
+    min-height: 380px;
+}
+
+.carousel-track {
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+    transition: transform 0.6s cubic-bezier(0.25, 0.92, 0.4, 1.05);
+}
+
+.carousel-item {
+    flex-shrink: 0;
+    border-radius: 28px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 20px 30px -10px rgba(0,0,0,0.15);
+    transform: scaleX(-1);
+}
+
+.carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ---------------- PANEL ---------------- */
+.action-panel {
+    margin-top: 300px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(8px);
+    padding: 16px 24px;
+    border-radius: 100px;
+}
+
+.email-input-group {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 60px;
+    padding: 4px 24px;
+    border: 1px solid #e2e8f0;
+    flex: 1;
+    min-width: 240px;
+}
+
+.email-input-group input {
+    border: none;
+    outline: none;
+    padding: 12px 0;
+    width: 100%;
+}
+
+/* кнопка */
+.buy-button {
+    background: linear-gradient(115deg, #fbbf24, #f59e0b);
+    border: none;
+    padding: 12px 32px;
+    border-radius: 60px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* ---------------- JS STYLE LOGIC ---------------- */
+</style>
+</head>
+
+<body>
+
+<div class="frame">
+
+    <div class="carousel-container">
+        <div class="carousel-track" id="track"></div>
+    </div>
+
+    <div class="action-panel">
+        <div class="email-input-group">
+            <input type="email" id="emailInput" placeholder="Ваш e-mail">
+        </div>
+        <button class="buy-button" id="buyBtn">КУПИТЬ 1500₽</button>
+    </div>
+
+</div>
+
+<script>
+const images = [
+    "bug.png",
+    "tufli.jpg",
+    "remeni.png",
+    "platie.jpg"
+];
+
+const track = document.getElementById("track");
+
+images.forEach(src => {
+    const div = document.createElement("div");
+    div.className = "carousel-item";
+    div.innerHTML = `<img src="${src}">`;
+    track.appendChild(div);
+});
+
+function updateStyles() {
+    [...track.children].forEach((item,i)=>{
+        if(i<3){
+            item.style.width="140px";
+            item.style.height="160px";
+        } else if(i===3){
+            item.style.width="118px";
+            item.style.height="135px";
+        } else {
+            item.style.width="90px";
+            item.style.height="110px";
+            item.style.opacity="0.6";
+        }
+    });
+}
+
+updateStyles();
+
+/* движение вправо */
+let anim=false;
+
+function moveRight(){
+    if(anim) return;
+    anim=true;
+
+    const last = track.lastElementChild;
+    const w = last.offsetWidth + 28;
+
+    track.style.transform=`translateX(${w}px)`;
+
+    setTimeout(()=>{
+        track.style.transition="none";
+        track.prepend(last);
+        track.style.transform="translateX(0)";
+        track.offsetHeight;
+        track.style.transition="0.6s";
+        updateStyles();
+        anim=false;
+    },600);
+}
+
+setInterval(moveRight,2000);
+
+/* кнопка */
+document.getElementById("buyBtn").onclick=()=>{
+    const email=document.getElementById("emailInput").value;
+    if(!email) alert("Введите email");
+    else alert("Отправлено: "+email);
+};
+</script>
+
+</body>
+</html>
