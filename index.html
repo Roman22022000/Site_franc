@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Карусель — анимация вправо</title>
+<title>Карусель — справа → влево</title>
 
 <style>
 * {
@@ -58,7 +58,7 @@ body {
 
 /* ---------------- CAROUSEL ---------------- */
 .carousel-container {
-    overflow: visible; /* чтобы бирка не обрезалась */
+    overflow: visible;
     margin: 0 auto;
     border-radius: 48px;
     padding: 16px 0 32px 0;
@@ -69,17 +69,18 @@ body {
     display: flex;
     gap: 28px;
     align-items: flex-start;
+    justify-content: flex-end; /* ключ: выравнивание вправо */
     transition: transform 0.6s cubic-bezier(0.25, 0.92, 0.4, 1.05);
 }
 
-.carousel-item { 
+.carousel-item {
     position: relative;
     flex-shrink: 0;
     border-radius: 28px;
-    overflow: visible; /* ВАЖНО */
+    overflow: visible;
     background: white;
     box-shadow: 0 20px 30px -10px rgba(0,0,0,0.15);
-    transform: scaleX(-1);
+    transform: none; /* убрали зеркалирование */
 }
 
 .carousel-item img.main-img {
@@ -88,18 +89,16 @@ body {
     object-fit: cover;
 }
 
-/* ---------------- TAG (БИРКА) ---------------- */
+/* ---------------- TAG ---------------- */
 .tag {
     position: absolute;
     top: -15%;
-    right: 85%;
-    width: 35%;        /* ключ: теперь зависит от размера карточки */
+    left: -15%; /* перенесли на левую сторону */
+    width: 35%;
     height: auto;
-
     z-index: 10;
     pointer-events: none;
-
-    transform: scaleX(-1) rotate(18deg);
+    transform: rotate(18deg); /* без отражения */
 }
 
 /* ---------------- PANEL ---------------- */
@@ -182,50 +181,57 @@ images.forEach(src => {
     track.appendChild(div);
 });
 
+/* размеры: справа → влево */
 function updateStyles() {
-    [...track.children].forEach((item,i)=>{
-        if(i<3){
-            item.style.width="140px";
-            item.style.height="160px";
-            item.style.opacity="1";
-        } else if(i===3){
-            item.style.width="118px";
-            item.style.height="135px";
-            item.style.opacity="0.85";
-        } else {
-            item.style.width="90px";
-            item.style.height="110px";
-            item.style.opacity="0.6";
+    const items = [...track.children];
+
+    items.forEach((item, i) => {
+        const fromRight = items.length - 1 - i;
+
+        if (fromRight < 3) {
+            item.style.width = "140px";
+            item.style.height = "160px";
+            item.style.opacity = "1";
+        }
+        else if (fromRight === 3) {
+            item.style.width = "118px";
+            item.style.height = "135px";
+            item.style.opacity = "0.85";
+        }
+        else {
+            item.style.width = "90px";
+            item.style.height = "110px";
+            item.style.opacity = "0.6";
         }
     });
 }
 
 updateStyles();
 
-/* движение вправо */
-let anim=false;
+/* движение справа → влево */
+let anim = false;
 
-function moveRight(){
+function moveLeft(){
     if(anim) return;
-    anim=true;
+    anim = true;
 
-    const last = track.lastElementChild;
-    const w = last.offsetWidth + 28;
+    const first = track.firstElementChild;
+    const w = first.offsetWidth + 28;
 
-    track.style.transform=`translateX(${w}px)`;
+    track.style.transform = `translateX(-${w}px)`;
 
     setTimeout(()=>{
         track.style.transition="none";
-        track.prepend(last);
+        track.appendChild(first);
         track.style.transform="translateX(0)";
         track.offsetHeight;
         track.style.transition="0.6s";
         updateStyles();
-        anim=false;
+        anim = false;
     },600);
 }
 
-setInterval(moveRight,2000);
+setInterval(moveLeft,2000);
 
 /* кнопка */
 document.getElementById("buyBtn").onclick=()=>{
