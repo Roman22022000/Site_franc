@@ -76,6 +76,7 @@ body {
 }
 
 .carousel-item {
+    position: relative;
     flex-shrink: 0;
     border-radius: 28px;
     overflow: hidden;
@@ -90,6 +91,21 @@ body {
     object-fit: cover;
 }
 
+
+    /* ---------------- TAG (БИРКА) ---------------- */
+.tag {
+    position: absolute;
+    top: -15%;
+    right: 85%;
+    width: 35%;
+    height: auto;
+
+    z-index: 10;
+    pointer-events: none;
+
+    transform: scaleX(-1) rotate(18deg);
+}
+    
 /* ---------------- PANEL ---------------- */
 .action-panel {
     margin-top: 300px;
@@ -167,6 +183,10 @@ images.forEach(src => {
     const div = document.createElement("div");
     div.className = "carousel-item";
     div.innerHTML = `<img src="${src}">`;
+    div.innerHTML = `
+    <img src="${src}" class="main-img">
+    <img src="Birka.png" class="tag">
+`;
     track.appendChild(div);
 });
 
